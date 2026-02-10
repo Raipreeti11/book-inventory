@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ## Book Inventory Management System
 
 This project is a simple book inventory management application built with React and Bootstrap on the front end and a lightweight Node.js/Express server for local persistence.  
