@@ -1,70 +1,173 @@
-# Getting Started with Create React App
+## Book Inventory Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a simple book inventory management application built with React and Bootstrap on the front end and a lightweight Node.js/Express server for local persistence.  
+It fetches initial sample data from the public JSONPlaceholder API and stores any books you create or edit in a local JSON file so your data survives browser refreshes and machine restarts.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- View a paginated list of books (5 per page).
+- See initial demo data fetched from `https://jsonplaceholder.typicode.com/posts` (first 5 records).
+- Add new books with title and author.
+- Persist new books in `server/localBooks.json` so they are not lost on refresh.
+- Edit and delete books that were added locally.
+- View book details on a dedicated page, with a back button that returns you to the same list page.
+- Pagination that automatically adjusts when items are deleted (for example, deleting the only item on page 2 takes you back to page 1).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Project structure (high level)
 
-### `npm test`
+- `src/`
+  - `App.js` – main routing and layout.
+  - `components/`
+    - `Header.jsx`, `Footer.jsx` – layout chrome.
+    - `BookTable.jsx` – table with pagination, inline edit for local books, and actions.
+    - `BookForm.jsx` – Add Book page and form.
+  - `pages/`
+    - `HomePage.jsx` – home page showing the table of books.
+    - `BookDetails.jsx` – details view with back navigation.
+  - `services/`
+    - `bookService.js` – all API calls (remote JSONPlaceholder + local Node server).
+  - `styles/style.css` – additional styling.
+- `server/`
+  - `index.js` – small Express server for local book persistence.
+  - `localBooks.json` – JSON file where locally added books are stored.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js (LTS version is recommended).
+- npm (installed with Node).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+To verify:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+node -v
+npm -v
+```
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Clone or download this repository.
+2. In a terminal, move into the project folder:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+cd book-inventory
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. Install dependencies:
 
-## Learn More
+```bash
+npm install
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+This installs both the React app dependencies and the backend server dependencies (Express, CORS, etc.).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## Running the project in development
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The project uses **two processes** in development:
 
-### Analyzing the Bundle Size
+- React development server (front end) on `http://localhost:3000`
+- Local books API server (back end) on `http://localhost:5001`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 1. Start the local books API server
 
-### Making a Progressive Web App
+In the project root:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+npm run server
+```
 
-### Advanced Configuration
+You should see a log similar to:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```text
+Local books API running on port 5001
+```
 
-### Deployment
+Keep this process running while you use the app.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 2. Start the React app
 
-### `npm run build` fails to minify
+Open a second terminal in the same project folder and run:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+npm start
+```
+
+This starts the React development server on `http://localhost:3000`.  
+The browser should open automatically; if not, open it manually.
+
+---
+
+## How data works
+
+When the app loads:
+
+1. `bookService.getBooks()` calls:
+   - `GET https://jsonplaceholder.typicode.com/posts?_limit=5` for the first 5 demo books.
+   - `GET http://localhost:5001/local-books` to load all books from `server/localBooks.json`.
+2. The two lists are combined in this order:
+   - API books first.
+   - Locally stored books from `localBooks.json` after that.
+
+When operations are performed:
+
+- **Add book**
+  - The Add Book form calls `bookService.addBook()`.
+  - This sends `POST http://localhost:5001/local-books` with `title` and `author`.
+  - The server assigns a new `id` (starting from 6) and writes the book into `server/localBooks.json`.
+
+- **Edit local book**
+  - For locally added books, inline edit in the table calls `bookService.updateBook(id, updates)`.
+  - This sends `PUT http://localhost:5001/local-books/:id` and updates the record in `localBooks.json`.
+
+- **Delete local book**
+  - Deleting a local book sends `DELETE http://localhost:5001/local-books/:id`.
+  - The server removes the record from `localBooks.json`.
+
+- **Edit/delete initial API books**
+  - For the initial demo entries (ids from JSONPlaceholder), `updateBook` and `deleteBook` fall back to the JSONPlaceholder API.
+  - These are for demo purposes only; the remote API is not actually persisted and may not reflect your changes permanently.
+
+Because locally added books are stored in `server/localBooks.json`, they are available again after:
+
+- Refreshing the browser.
+- Restarting the React dev server.
+- Restarting the machine (as long as the file remains).
+
+---
+
+## Resetting local data
+
+If you want to clear all locally added books and start fresh, you can:
+
+1. Stop the local server if it is running.
+2. Open `server/localBooks.json`.
+3. Replace its contents with:
+
+```json
+[]
+```
+
+4. Save the file and restart `npm run server` and `npm start`.
+
+---
+
+## Building for production
+
+To create an optimized production build of the React app:
+
+```bash
+npm run build
+```
+
+The compiled assets will be written to the `build` directory.  
+For production use, you would typically serve the `build` folder behind a static file server and run the Node server (or another backend) separately to handle data persistence.
+
