@@ -172,5 +172,3 @@ The compiled assets will be written to the `build` directory.
 For production use, you would typically serve the `build` folder behind a static file server and run the Node server (or another backend) separately to handle data persistence.
 
 =======
-# BOOK-INVENTORY
->>>>>>> 7202b7ac4185c338f1ec66a9d1f06cccfdb2fe72
