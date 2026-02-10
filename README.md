@@ -171,4 +171,3 @@ npm run build
 The compiled assets will be written to the `build` directory.  
 For production use, you would typically serve the `build` folder behind a static file server and run the Node server (or another backend) separately to handle data persistence.
 
-=======
