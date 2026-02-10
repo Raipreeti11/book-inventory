@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Book Inventory Management System
 
 This project is a simple book inventory management application built with React and Bootstrap on the front end and a lightweight Node.js/Express server for local persistence.  
@@ -171,3 +172,6 @@ npm run build
 The compiled assets will be written to the `build` directory.  
 For production use, you would typically serve the `build` folder behind a static file server and run the Node server (or another backend) separately to handle data persistence.
 
+=======
+# BOOK-INVENTORY
+>>>>>>> 7202b7ac4185c338f1ec66a9d1f06cccfdb2fe72
